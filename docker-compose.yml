@@ -1,6 +1,6 @@
 services:
   database:
-    image: 'postgres:17' # NOTE:  Will _NOT_ work >= 18 ('latest' will break this)
+    image: 'postgres:17'
     ports:
       - 15432:5432
     env_file:
@@ -22,9 +22,8 @@ services:
     networks:
       - postgres-network
     volumes:
-      # REQUIRED BEFORE BRINGING UP THE STACK
-      #      $ chown -R 5050:5050 ${PWD}/pgadmin-data
-      # (ref: https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html#mapped-files-and-directories)
+      # pgAdmin writes session data here. If startup fails with a permission
+      # error, set the host folder owner to 5050:5050 before starting.
       - ${PWD}/pgadmin-data/:/var/lib/pgadmin/
 
 networks: 

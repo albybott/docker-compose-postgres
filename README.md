@@ -4,7 +4,7 @@
 
 This tutorial teaches you how to create a Postgres Docker Compose file.
 
->Last updated March 13, 2022 </br>
+>Last updated May 16, 2026 </br>
 Time to read 3m
 
 ## Context
@@ -62,8 +62,9 @@ services:
   # but you can use the name of your choice.
   # Note: This may change the commands you are going to use a little bit.
   database:
-    # Official Postgres image from DockerHub (we use the last version)
-    image: 'postgres:latest'
+    # Official Postgres image from DockerHub.
+    # Pin a major version instead of using latest so major releases do not break your local stack.
+    image: 'postgres:17'
 
     # By default, a Postgres database is running on the 5432 port.
     # If we want to access the database from our computer (outside the container),
@@ -101,6 +102,9 @@ As I explained in the Postgres Docker Compose comments, the environment variable
 ```env
 POSTGRES_USER=username
 POSTGRES_PASSWORD=password
+POSTGRES_DB=default_database
+PGADMIN_DEFAULT_EMAIL=admin@example.com
+PGADMIN_DEFAULT_PASSWORD=password
 ```
 
 Once you did it, it means your environment part isn't used anymore so that you can remove it.
@@ -184,7 +188,22 @@ After you ran docker compose (see next step) you can access pgadmin at `localhos
 Once logged in, you need to connect to the database in your docker network.
 To do so, right click on 'servers' on the left side and go to 'Servers > Register > Server...'.
 In the general tab, specify a name of your liking.
-In the connection tab, as the host name enter the name of the postgres service in the docker-compose.yml file (in our case "database") and as the port the post inside the docker-network (in our case the default 5432).
+In the connection tab, as the host name enter the name of the postgres service in the docker-compose.yml file (in our case "database") and as the port the post inside the docker-network (in our case the default 5432). Use the Postgres credentials from the `.env` file, for example `POSTGRES_USER=username` and `POSTGRES_PASSWORD=password`.
+
+If pgAdmin cannot resolve the service name from your Docker setup, inspect the database container and use its network IP address as the host:
+
+```shell
+docker inspect docker-compose-postgres-database-1
+```
+
+If pgAdmin fails to start with a `Permission denied: '/var/lib/pgadmin/sessions'` error, make sure the mapped host folder can be written by pgAdmin. For the official pgAdmin container, the mapped files and directories are owned by user/group `5050:5050`:
+
+```shell
+mkdir -p pgadmin-data
+chown -R 5050:5050 pgadmin-data
+```
+
+See the [pgAdmin container deployment documentation](https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html#mapped-files-and-directories) for details.
 
 
 
@@ -195,19 +214,19 @@ Your Docker Compose is ready! 🚀
 In the root of your project repository, type the following command to install the dependencies and run your database:
 
 ```shell
-docker-compose up
+docker compose up
 ```
 
 That's it; everything is set up! To test your database, you should connect to it using the software or programming language of your choice.
 
-As a reminder, the Postgres database is accessible on localhost with the port 5432. You can find the connection information (the username, the password, and the default database).
+As a reminder, the Postgres database is accessible on localhost with the port 15432 in the compose file from this repository. You can find the connection information (the username, the password, and the default database) in the `.env` file.
 
 ### Step 4. Stop the Docker Compose
 
 As I mentioned before, one of the advantages of using Docker Compose for Postgres is to avoid background processes on your computer. When you finish working on your project, I recommend you to stop the running Postgres Docker container using the command below:
 
 ```shell
-docker-compose down
+docker compose down
 ```
 
 Once you want to work again on your project, you can use docker-compose up again to run your database.
