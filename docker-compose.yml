@@ -1,6 +1,6 @@
 services:
   database:
-    image: 'postgres:latest'
+    image: 'postgres:17' # NOTE:  Will _NOT_ work >= 18 ('latest' will break this)
     ports:
       - 15432:5432
     env_file:
@@ -22,6 +22,9 @@ services:
     networks:
       - postgres-network
     volumes:
+      # REQUIRED BEFORE BRINGING UP THE STACK
+      #      $ chown -R 5050:5050 ${PWD}/pgadmin-data
+      # (ref: https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html#mapped-files-and-directories)
       - ${PWD}/pgadmin-data/:/var/lib/pgadmin/
 
 networks: 
