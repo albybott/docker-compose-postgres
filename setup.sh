@@ -24,7 +24,7 @@ detect_host() {
 
 default_user="${POSTGRES_USER:-postgres}"
 default_db="${POSTGRES_DB:-postgres}"
-random_port=$((RANDOM % 10001 + 40000))
+random_port=$((RANDOM % 11 + 41860))
 default_port="${PORT:-$random_port}"
 default_password="${POSTGRES_PASSWORD:-$(openssl rand -hex 12)}"
 default_host="${HOST:-$(detect_host)}"
