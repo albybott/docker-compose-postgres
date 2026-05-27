@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ── defaults ──────────────────────────────────────────────────────────
-default_user="postgres"
-default_db="postgres"
-default_port="5432"
-default_password=$(openssl rand -hex 12)
+# ── load existing values ──────────────────────────────────────────────
+if [ -f .env ]; then
+  # shellcheck disable=SC1091
+  source .env
+fi
 
+# ── defaults (prefer existing .env values) ────────────────────────────
 detect_host() {
   # macOS
   if command -v ipconfig &>/dev/null; then
@@ -21,7 +22,11 @@ detect_host() {
   echo "localhost"
 }
 
-default_host=$(detect_host)
+default_user="${POSTGRES_USER:-postgres}"
+default_db="${POSTGRES_DB:-postgres}"
+default_port="${PORT:-5432}"
+default_password="${POSTGRES_PASSWORD:-$(openssl rand -hex 12)}"
+default_host="${HOST:-$(detect_host)}"
 
 # ── helpers ───────────────────────────────────────────────────────────
 ask() {
