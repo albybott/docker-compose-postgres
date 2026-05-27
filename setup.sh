@@ -4,7 +4,7 @@ set -euo pipefail
 # ── defaults ──────────────────────────────────────────────────────────
 default_user="postgres"
 default_db="postgres"
-default_port="15432"
+default_port="5432"
 default_password=$(openssl rand -hex 12)
 
 # ── helpers ───────────────────────────────────────────────────────────

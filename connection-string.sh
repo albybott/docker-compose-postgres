@@ -9,7 +9,7 @@ fi
 # shellcheck disable=SC1091
 source .env
 
-port="${PORT:-15432}"
+port="${PORT:-5432}"
 host="$(ipconfig getifaddr en0 2>/dev/null || echo 127.0.0.1)"
 
 echo "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${host}:${port}/${POSTGRES_DB}"
