@@ -1,10 +1,10 @@
-# Docker-Compose with PostgreSQL ready to use
+# Docker Compose with PostgreSQL ready to use
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/felipewom)
 
 This tutorial teaches you how to create a Postgres Docker Compose file.
 
->Last updated May 16, 2026 </br>
+>Last updated May 28, 2026 </br>
 Time to read 3m
 
 ## Context
@@ -19,6 +19,21 @@ I like to use containers for some of my tools. I'm not going to lie, I'm not con
 
 One command is enough to set up a Postgres database in Docker from scratch with new parameters. With one command, you can also shut down all the environment and free your computer from work.
 
+## Quick Start
+
+Clone this repo and run the setup script:
+
+```shell
+git clone <repo-url> my-project && cd my-project
+./setup.sh
+docker compose up -d
+```
+
+The setup script will prompt you for a username, password, and database name — all with sensible defaults generated automatically:
+
+- **User and DB name**: derived from the folder name
+- **Password**: a random 24-character alphanumeric string
+
 ## Create a Postgres Docker Compose
 
 In this part, I will show you how to create a Postgres Docker Compose example. The configuration file will be detailed line per line, so you will be able to test it and configure it for your needs.
@@ -27,13 +42,13 @@ In this part, I will show you how to create a Postgres Docker Compose example. T
 
 The first step consists of creating the configuration file to run Postgres in Docker.
 
-This file is called docker-compose.yml, and you can make it at your project's root. If you don't have any project yet, you can do it in a new folder on your computer.
+This file is called `compose.yml`, and you can make it at your project's root. If you don't have any project yet, you can do it in a new folder on your computer.
 
 Once you created the Docker Compose file, your folder architecture should be similar as below.
 ```
     .
     ├── [...]
-    └── docker-compose.yml
+    └── compose.yml
     [...] directories, 1 file
 ```
 
@@ -48,7 +63,7 @@ The main two steps of the configuration will be:
 2. configure the database to fit your needs and use it on your computer
 
 Below, you will find the Docker Compose file. Each line is commented on so that you can understand the purpose of each instruction.
-  
+
 **Database Service:**
 
 ```yaml
@@ -89,27 +104,25 @@ With this first version of your Postgres Docker Compose file, you will be able t
 Before running your file, I want to share with you some optional configurations. These steps are not mandatory, and to keep the Postgres Docker Compose example simple, we will not use them at the tutorial end.
 
 Set-up an environment file for your Postgres database
-If you don't want to put your environment variable in your Docker Compose file, you can create an environment file at your project root. This file should be named .env, and it should be located at the root of your repository with your Docker Compose.
+If you don't want to put your environment variable in your Docker Compose file, you can create an environment file at your project root. This file should be named `.env`, and it should be located at the root of your repository with your Docker Compose.
 
     .
     ├── [...]
     ├── .env
-    └── docker-compose.yml
+    └── compose.yml
     [...] directories, 1 file
 
-As I explained in the Postgres Docker Compose comments, the environment variables are defined in the environment part of the configuration. If you copy/paste the environment variables from the Docker Compose file to your .env file, you will have the following:
+As I explained in the Postgres Docker Compose comments, the environment variables are defined in the environment part of the configuration. If you copy/paste the environment variables from the Docker Compose file to your `.env` file, you will have the following:
 
 ```env
 POSTGRES_USER=username
 POSTGRES_PASSWORD=password
 POSTGRES_DB=default_database
-PGADMIN_DEFAULT_EMAIL=admin@example.com
-PGADMIN_DEFAULT_PASSWORD=password
 ```
 
 Once you did it, it means your environment part isn't used anymore so that you can remove it.
 
-#### REMOVE THESE LINES FROM `docker-compose.yml`
+#### REMOVE THESE LINES FROM `compose.yml`
 
 ```yaml
 environment:
@@ -126,7 +139,7 @@ env_file:
     - .env # The name of your environment file (the one at the repository root)
 ```
 
-Your Docker Compose will use the environment variables defined inside the .env to configure the database.
+Your Docker Compose will use the environment variables defined inside the `.env` to configure the database.
 
 ### Use a volume to persist data on your computer
 
@@ -160,53 +173,6 @@ volumes:
 
 ```
 
-### Add a pgadmin service to access your database via a UI
-
-```yml
-services:
-
-  database:
-    ... # details from above
-
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - 15433:80
-    env_file:
-      - .env
-    depends_on:
-      - database
-    networks:
-      - postgres-network
-    volumes:
-      - ${PWD}/pgadmin-data/:/var/lib/pgadmin/
-```
-
-The pgadmin service allows you - once run - to access your postgreSQL database via a browser and quickly inspect or manage your data from there. 
-After you ran docker compose (see next step) you can access pgadmin at `localhost:15433` in your browser and login with the admin email and password as specified in the `.env` file.
-
-Once logged in, you need to connect to the database in your docker network.
-To do so, right click on 'servers' on the left side and go to 'Servers > Register > Server...'.
-In the general tab, specify a name of your liking.
-In the connection tab, as the host name enter the name of the postgres service in the docker-compose.yml file (in our case "database") and as the port the post inside the docker-network (in our case the default 5432). Use the Postgres credentials from the `.env` file, for example `POSTGRES_USER=username` and `POSTGRES_PASSWORD=password`.
-
-If pgAdmin cannot resolve the service name from your Docker setup, inspect the database container and use its network IP address as the host:
-
-```shell
-docker inspect docker-compose-postgres-database-1
-```
-
-If pgAdmin fails to start with a `Permission denied: '/var/lib/pgadmin/sessions'` error, make sure the mapped host folder can be written by pgAdmin. For the official pgAdmin container, the mapped files and directories are owned by user/group `5050:5050`:
-
-```shell
-mkdir -p pgadmin-data
-chown -R 5050:5050 pgadmin-data
-```
-
-See the [pgAdmin container deployment documentation](https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html#mapped-files-and-directories) for details.
-
-
-
 ### Step 3. Run the Docker Compose
 
 Your Docker Compose is ready! 🚀
@@ -229,7 +195,7 @@ As I mentioned before, one of the advantages of using Docker Compose for Postgre
 docker compose down
 ```
 
-Once you want to work again on your project, you can use docker-compose up again to run your database.
+Once you want to work again on your project, you can use `docker compose up` again to run your database.
 
 ## Author
 
