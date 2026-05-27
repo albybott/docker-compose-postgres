@@ -6,7 +6,7 @@ folder_name=$(basename "$PWD")
 default_user="$folder_name"
 default_db="$folder_name"
 default_email="albybott@gmail.com"
-default_password=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 24)
+default_password=$(openssl rand -hex 12)
 
 # ── helpers ───────────────────────────────────────────────────────────
 ask() {
