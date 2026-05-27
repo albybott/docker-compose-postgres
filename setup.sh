@@ -2,10 +2,9 @@
 set -euo pipefail
 
 # ── defaults ──────────────────────────────────────────────────────────
-folder_name=$(basename "$PWD")
-default_user="$folder_name"
-default_db="$folder_name"
-default_email="albybott@gmail.com"
+default_user="postgres"
+default_db="postgres"
+default_port="15432"
 default_password=$(openssl rand -hex 12)
 
 # ── helpers ───────────────────────────────────────────────────────────
@@ -22,6 +21,7 @@ echo ""
 POSTGRES_USER=$(ask "POSTGRES_USER" "$default_user")
 POSTGRES_PASSWORD=$(ask "POSTGRES_PASSWORD" "$default_password")
 POSTGRES_DB=$(ask "POSTGRES_DB" "$default_db")
+PORT=$(ask "PORT" "$default_port")
 
 # ── write .env ────────────────────────────────────────────────────────
 cat > .env <<EOF
@@ -30,5 +30,11 @@ POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 POSTGRES_DB=$POSTGRES_DB
 EOF
 
+# ── update compose.yml with chosen port ───────────────────────────────
+sed -i '' "s/[0-9]*:5432/${PORT}:5432/" compose.yml
+
 echo ""
 echo "Created .env — ready to run: docker compose up -d"
+echo ""
+echo "Connection string:"
+"$(dirname "$0")"/connection-string.sh "$PORT"
