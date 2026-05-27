@@ -28,10 +28,8 @@ cat > .env <<EOF
 POSTGRES_USER=$POSTGRES_USER
 POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 POSTGRES_DB=$POSTGRES_DB
+PORT=$PORT
 EOF
-
-# ── update compose.yml with chosen port ───────────────────────────────
-sed -i '' "s/[0-9]*:5432/${PORT}:5432/" compose.yml
 
 echo ""
 echo "Created .env — ready to run: docker compose up -d"
